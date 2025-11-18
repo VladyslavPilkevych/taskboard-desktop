@@ -1,0 +1,31 @@
+{
+  "name": "taskboard-desktop",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "workspaces": [
+    "app",
+    "backend"
+  ],
+  "scripts": {
+    "dev:backend": "pnpm --filter backend run start:dev",
+    "dev:frontend": "pnpm --filter app run dev",
+    "dev:electron": "pnpm --filter src-electron dev",
+    "dev": "concurrently \"pnpm dev:backend\" \"pnpm dev:frontend\" \"pnpm dev:electron\"",
+    "build:backend": "pnpm --filter backend run build",
+    "build:frontend": "pnpm --filter app build",
+    "build:electron": "pnpm --filter src-electron build",
+    "build": "pnpm build:backend && pnpm build:frontend && pnpm build:electron",
+    "prisma:migrate": "pnpm --filter backend prisma migrate dev"
+  },
+  "devDependencies": {
+    "@nestjs/cli": "^11.0.11",
+    "@nestjs/schematics": "^11.0.9",
+    "concurrently": "^8.2.0",
+    "prisma": "^6.19.0",
+    "typescript": "^5.5.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0"
+  }
+}

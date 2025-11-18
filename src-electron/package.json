@@ -1,0 +1,42 @@
+{
+  "name": "src-electron",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently \"pnpm tsc:watch\" \"pnpm electron:dev\"",
+    "tsc:watch": "tsc --watch",
+    "electron:dev": "cross-env NODE_ENV=development electron .",
+    "build": "tsc && electron-builder"
+  },
+  "build": {
+    "appId": "com.example.tasksdesktop",
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.productivity"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "files": [
+      "dist/**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/.bin",
+      "!**/*.{o,hprof,orig,pyc,pyo,rbc}"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.16.1",
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.2",
+    "electron-builder": "^26.0.12"
+  }
+}
