@@ -66,6 +66,16 @@ The focus of the application is a clean, modern, and responsive user experience 
 - concurrently for development scripts
 - Docker and docker-compose (optional)
 
+## Code Quality Tools
+
+This project uses the following tools to ensure consistent code style and code quality:
+
+- **ESLint** — static analysis and linting for JavaScript/TypeScript
+- **Prettier** — automatic code formatting
+- **Husky** — Git hooks for running automated checks before commits
+
+These tools help maintain a clean and consistent codebase throughout the entire monorepo.
+
 ## Project Structure
 
 ```
