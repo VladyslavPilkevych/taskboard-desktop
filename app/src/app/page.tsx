@@ -9,25 +9,19 @@ import {
   DragEndEvent,
   DragStartEvent,
   rectIntersection,
-  useDroppable,
   DragOverlay,
 } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/components/task-card";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Search, Filter, PlusCircle } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTasksBoard } from "@/lib/use-tasks-board";
+import { TaskColumn } from "@/components/task-column";
+import CreateTaskComponent from "@/components/create-task-component";
 
 type TaskStatus = "todo" | "done";
 type ViewFilter = "all" | "active" | "completed";
@@ -40,129 +34,13 @@ interface Task {
   order: number;
 }
 
-interface SortableTaskCardProps {
-  task: Task;
-  onToggleCompleted: (id: string, value: boolean) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, data: { title: string; description: string }) => void;
-}
-
-function SortableTaskCard({
-  task,
-  onToggleCompleted,
-  onDelete,
-  onEdit,
-}: SortableTaskCardProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: task.id,
-    data: {
-      type: "task",
-      status: task.status,
-    },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.6 : 1,
-  };
-
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <TaskCard
-        title={task.title}
-        description={task.description}
-        completed={task.status === "done"}
-        onToggleCompleted={(value) => onToggleCompleted(task.id, value)}
-        onDelete={() => onDelete(task.id)}
-        onEdit={(data) => onEdit(task.id, data)}
-      />
-    </div>
-  );
-}
-
-interface ColumnProps {
-  id: TaskStatus;
-  title: string;
-  tasks: Task[];
-  onToggleCompleted: (id: string, value: boolean) => void;
-  onDelete: (id: string) => void;
-  onEdit: (id: string, data: { title: string; description: string }) => void;
-}
-
-function TaskColumn({
-  id,
-  title,
-  tasks,
-  onToggleCompleted,
-  onDelete,
-  onEdit,
-}: ColumnProps) {
-  const sortedTasks = [...tasks].sort((a, b) => a.order - b.order);
-
-  const { setNodeRef, isOver } = useDroppable({
-    id,
-    data: {
-      type: "column",
-      status: id,
-    },
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={cn(
-        "flex flex-col gap-3 rounded-2xl border border-border bg-card/60 p-3 shadow-soft min-h-[220px] transition-colors",
-        isOver && "ring-2 ring-ring/60"
-      )}
-    >
-      <div className="flex items-center justify-between pb-1">
-        <span className="text-sm font-semibold">{title}</span>
-        <span className="text-xs text-muted-foreground">
-          {sortedTasks.length} task{sortedTasks.length === 1 ? "" : "s"}
-        </span>
-      </div>
-
-      <SortableContext
-        items={sortedTasks.map((t) => t.id)}
-        strategy={verticalListSortingStrategy}
-      >
-        <div className="flex flex-col gap-3">
-          {sortedTasks.map((task) => (
-            <SortableTaskCard
-              key={task.id}
-              task={task}
-              onToggleCompleted={onToggleCompleted}
-              onDelete={onDelete}
-              onEdit={onEdit}
-            />
-          ))}
-        </div>
-      </SortableContext>
-    </div>
-  );
-}
-
 export default function HomePage() {
-  // const { tasks, updateTasks } = useTasks();
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [search, setSearch] = useState("");
   const [viewFilter, setViewFilter] = useState<ViewFilter>("all");
   const [activeTask, setActiveTask] = useState<Task | null>(null);
 
   const {
     tasks,
-    // isLoading, // TODO
-    // isError, // TODO
-    createTask,
     editTask,
     deleteTask,
     toggleTaskCompleted,
@@ -202,15 +80,6 @@ export default function HomePage() {
     () => filteredTasks.filter((t) => t.status === "done"),
     [filteredTasks]
   );
-
-  function handleAddTask() {
-    if (!title.trim()) return;
-
-    createTask(title.trim(), description.trim());
-
-    setTitle("");
-    setDescription("");
-  }
 
   function handleToggleCompleted(id: string, value: boolean) {
     toggleTaskCompleted(id, value);
@@ -310,31 +179,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border bg-card/60 p-4 shadow-soft space-y-3">
-          <h2 className="text-sm font-medium text-foreground">
-            Create a new task
-          </h2>
-
-          <div className="flex flex-col gap-3">
-            <Input
-              placeholder="Task title..."
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <Textarea
-              placeholder="Task description (optional)..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
-
-          <div className="flex justify-end">
-            <Button variant="default" size="lg" onClick={handleAddTask}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Add task
-            </Button>
-          </div>
-        </section>
+        <CreateTaskComponent />
 
         <DndContext
           sensors={sensors}

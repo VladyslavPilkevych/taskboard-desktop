@@ -7,9 +7,7 @@ export function createLocalTask(
 ): Task {
   const todoTasks = existing.filter((t) => t.status === "todo");
   const nextOrder =
-    todoTasks.length > 0
-      ? Math.max(...todoTasks.map((t) => t.order)) + 1
-      : 0;
+    todoTasks.length > 0 ? Math.max(...todoTasks.map((t) => t.order)) + 1 : 0;
 
   return {
     id: `temp-${Date.now()}`,
@@ -31,7 +29,7 @@ export function applyToggleStatus(
   const fromStatus = task.status;
   if (fromStatus === targetStatus) return tasks;
 
-  const moved = { ...task, status: targetStatus };
+  const moved: Task = { ...task, status: targetStatus };
   const others = tasks.filter((t) => t.id !== id);
   const result = [...others, moved];
 
@@ -65,9 +63,7 @@ export function applyEditTask(
   title: string,
   description: string
 ): Task[] {
-  return tasks.map((t) =>
-    t.id === id ? { ...t, title, description } : t
-  );
+  return tasks.map((t) => (t.id === id ? { ...t, title, description } : t));
 }
 
 export function applyDeleteTask(tasks: Task[], id: string): Task[] {
@@ -93,7 +89,7 @@ export function applyReorder(
   } else {
     const overTask = tasks.find((t) => t.id === targetIdOrColumn);
     if (overTask) {
-      targetStatus = overTask.status;
+      targetStatus = overTask.status as TaskStatus;
       targetTaskId = overTask.id;
     }
   }
@@ -111,8 +107,8 @@ export function applyReorder(
     let newIndex = oldIndex;
 
     if (targetTaskId) {
-      newIndex = columnTasks.findIndex((t) => t.id === targetTaskId);
-      if (newIndex === -1) newIndex = oldIndex;
+      const idx = columnTasks.findIndex((t) => t.id === targetTaskId);
+      if (idx !== -1) newIndex = idx;
     } else {
       newIndex = columnTasks.length - 1;
     }
@@ -146,8 +142,8 @@ export function applyReorder(
 
   let toIndex: number;
   if (targetTaskId) {
-    toIndex = toTasks.findIndex((t) => t.id === targetTaskId);
-    if (toIndex === -1) toIndex = toTasks.length;
+    const idx = toTasks.findIndex((t) => t.id === targetTaskId);
+    toIndex = idx === -1 ? toTasks.length : idx;
   } else {
     toIndex = toTasks.length;
   }

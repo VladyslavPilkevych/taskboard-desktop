@@ -17,8 +17,6 @@ import {
   createLocalTask,
 } from "./board-logic";
 
-const COLUMN_IDS: TaskStatus[] = ["todo", "done"];
-
 export function useTasksBoard() {
   const queryClient = useQueryClient();
 
