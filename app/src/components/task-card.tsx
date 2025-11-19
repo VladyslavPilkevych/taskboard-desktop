@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardContent,
   CardFooter,
+  CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,10 +30,7 @@ interface TaskCardProps {
   completed: boolean;
   onToggleCompleted: (value: boolean) => void;
   onDelete: () => void;
-  onEdit: (data: {
-    title: string;
-    description: string;
-  }) => void;
+  onEdit: (data: { title: string; description: string }) => void;
 }
 
 export function TaskCard({
@@ -47,38 +45,34 @@ export function TaskCard({
   const [editTitle, setEditTitle] = useState(title);
   const [editDescription, setEditDescription] = useState(description);
 
-const handleOpenChange = (open: boolean) => {
-  setEditOpen(open);
-  if (open) {
-    setEditTitle(title);
-    setEditDescription(description);
-  }
-};
+  const handleOpenChange = (open: boolean) => {
+    setEditOpen(open);
+    if (open) {
+      setEditTitle(title);
+      setEditDescription(description);
+    }
+  };
 
-  function handleSave() {
+  const handleSave = () => {
     const newTitle = editTitle.trim() || title;
     const newDescription = editDescription.trim();
-    onEdit({
-      title: newTitle,
-      description: newDescription,
-    });
+    onEdit({ title: newTitle, description: newDescription });
     setEditOpen(false);
-  }
+  };
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col border border-border bg-card shadow-soft transition-colors duration-300">
       <CardHeader className="space-y-2">
         <div className="flex items-start justify-between gap-3">
-          <button
-            type="button"
-            className="flex flex-1 items-center gap-3 text-left"
+          <div
+            className="flex flex-1 items-center gap-3 text-left cursor-pointer"
             onClick={() => onToggleCompleted(!completed)}
           >
             <Checkbox
               checked={completed}
               onCheckedChange={(v) => onToggleCompleted(!!v)}
             />
-            <div className="flex flex-col gap-1">
+            <CardTitle className="flex flex-col gap-1">
               <span
                 className={cn(
                   "truncate",
@@ -87,17 +81,13 @@ const handleOpenChange = (open: boolean) => {
               >
                 {title}
               </span>
-            </div>
-          </button>
+            </CardTitle>
+          </div>
 
           <div className="flex items-center gap-1">
             <Dialog open={editOpen} onOpenChange={handleOpenChange}>
               <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Edit task"
-                >
+                <Button variant="ghost" size="icon" aria-label="Edit task">
                   <Pencil className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -105,7 +95,7 @@ const handleOpenChange = (open: boolean) => {
                 <DialogHeader>
                   <DialogTitle>Edit task</DialogTitle>
                   <DialogDescription>
-                    Change the title or description of this task.
+                    Update the title and description of this task.
                   </DialogDescription>
                 </DialogHeader>
 
@@ -145,11 +135,7 @@ const handleOpenChange = (open: boolean) => {
 
             <Dialog>
               <DialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Delete task"
-                >
+                <Button variant="ghost" size="icon" aria-label="Delete task">
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
@@ -157,8 +143,8 @@ const handleOpenChange = (open: boolean) => {
                 <DialogHeader>
                   <DialogTitle>Delete this task?</DialogTitle>
                   <DialogDescription>
-                    This action cannot be undone. Are you sure you want to permanently
-                    delete this task?
+                    This action cannot be undone. Are you sure you want to
+                    permanently delete this task?
                   </DialogDescription>
                 </DialogHeader>
 
