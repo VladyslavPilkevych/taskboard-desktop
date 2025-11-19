@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { PlusCircle } from 'lucide-react'
+import { useState } from 'react'
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
-import { useTasksBoard } from "@/utils/hooks/use-tasks-board";
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { useTasksBoard } from '@/utils/hooks/use-tasks-board'
 
 export default function CreateTaskComponent() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
 
-  const { createTask } = useTasksBoard();
+  const { createTask } = useTasksBoard()
 
   function handleAddTask() {
-    if (!title.trim()) return;
+    if (!title.trim()) return
 
-    createTask(title.trim(), description.trim());
+    createTask(title.trim(), description.trim())
 
-    setTitle("");
-    setDescription("");
+    setTitle('')
+    setDescription('')
   }
 
   return (
@@ -47,5 +47,5 @@ export default function CreateTaskComponent() {
         </Button>
       </div>
     </section>
-  );
+  )
 }

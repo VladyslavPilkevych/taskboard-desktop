@@ -1,8 +1,8 @@
-"use client";
+'use client'
 
-import { ReactNode, useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { ReactNode, useState } from 'react'
 
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -14,8 +14,8 @@ export function AppProviders({ children }: { children: ReactNode }) {
             refetchOnWindowFocus: false,
           },
         },
-      })
-  );
+      }),
+  )
 
   return (
     <NextThemesProvider
@@ -26,5 +26,5 @@ export function AppProviders({ children }: { children: ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </NextThemesProvider>
-  );
+  )
 }

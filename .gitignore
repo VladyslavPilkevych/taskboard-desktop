@@ -63,3 +63,5 @@ src-electron/*.log
 
 docker-data/
 docker-compose.override.yml
+
+/.prettier-cache

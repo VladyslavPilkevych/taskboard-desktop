@@ -1,6 +1,8 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
+import { Trash2 } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogTrigger,
@@ -9,11 +11,10 @@ import {
   DialogTitle,
   DialogDescription,
   DialogClose,
-} from "@/components/ui/dialog";
-import { Trash2 } from "lucide-react";
+} from '@/components/ui/dialog'
 
 interface TaskDialogDeleteProps {
-  onDelete: () => void;
+  onDelete: () => void
 }
 
 export function TaskDialogDelete({ onDelete }: TaskDialogDeleteProps) {
@@ -28,8 +29,7 @@ export function TaskDialogDelete({ onDelete }: TaskDialogDeleteProps) {
         <DialogHeader>
           <DialogTitle>Delete this task?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. Are you sure you want to permanently
-            delete this task?
+            This action cannot be undone. Are you sure you want to permanently delete this task?
           </DialogDescription>
         </DialogHeader>
 
@@ -45,5 +45,5 @@ export function TaskDialogDelete({ onDelete }: TaskDialogDeleteProps) {
         </div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

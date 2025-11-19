@@ -1,29 +1,23 @@
-"use client";
+'use client'
 
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardFooter,
-  CardTitle,
-} from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/utils/lib/cn";
-import { TaskDialogEdit } from "@/components/task-dialog-edit";
-import { TaskDialogDelete } from "@/components/task-dialog-delete";
+import { TaskDialogDelete } from '@/components/task-dialog-delete'
+import { TaskDialogEdit } from '@/components/task-dialog-edit'
+import { Card, CardHeader, CardContent, CardFooter, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
+import { cn } from '@/utils/lib/cn'
 
 interface TaskCardProps {
-  title: string;
-  description?: string;
-  completed: boolean;
-  onToggleCompleted: (value: boolean) => void;
-  onDelete: () => void;
-  onEdit: (data: { title: string; description: string }) => void;
+  title: string
+  description?: string
+  completed: boolean
+  onToggleCompleted: (value: boolean) => void
+  onDelete: () => void
+  onEdit: (data: { title: string; description: string }) => void
 }
 
 export function TaskCard({
   title,
-  description = "",
+  description = '',
   completed,
   onToggleCompleted,
   onDelete,
@@ -37,17 +31,9 @@ export function TaskCard({
             className="flex flex-1 items-center gap-3 text-left cursor-pointer"
             onClick={() => onToggleCompleted(!completed)}
           >
-            <Checkbox
-              checked={completed}
-              onCheckedChange={(v) => onToggleCompleted(!!v)}
-            />
+            <Checkbox checked={completed} onCheckedChange={(v) => onToggleCompleted(!!v)} />
             <CardTitle className="flex flex-col gap-1">
-              <span
-                className={cn(
-                  "truncate",
-                  completed && "line-through text-muted-foreground"
-                )}
-              >
+              <span className={cn('truncate', completed && 'line-through text-muted-foreground')}>
                 {title}
               </span>
             </CardTitle>
@@ -68,15 +54,13 @@ export function TaskCard({
 
       {description && description.trim().length > 0 && (
         <CardContent>
-          <p className="text-sm text-muted-foreground whitespace-pre-line">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground whitespace-pre-line">{description}</p>
         </CardContent>
       )}
 
       <CardFooter className="justify-end text-xs text-muted-foreground">
-        {completed ? "Completed" : "Pending"}
+        {completed ? 'Completed' : 'Pending'}
       </CardFooter>
     </Card>
-  );
+  )
 }

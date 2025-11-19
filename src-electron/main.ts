@@ -1,22 +1,25 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import * as path from 'path';
+import * as path from 'path'
 
-const isDev = !app.isPackaged;
+import { app, BrowserWindow, ipcMain } from 'electron'
 
-let mainWindow: BrowserWindow | null = null;
+const isDev = !app.isPackaged
+
+let mainWindow: BrowserWindow | null = null
 
 async function waitForNext() {
   return new Promise((resolve) => {
     const interval = setInterval(async () => {
       try {
-        const res = await fetch("http://localhost:3000");
+        const res = await fetch('http://localhost:3000')
         if (res.ok) {
-          clearInterval(interval);
-          resolve(true);
+          clearInterval(interval)
+          resolve(true)
         }
-      } catch {}
-    }, 500);
-  });
+      } catch (error) {
+        console.error(error)
+      }
+    }, 500)
+  })
 }
 
 async function createWindow() {
@@ -30,29 +33,29 @@ async function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
-  });
+  })
 
   if (isDev) {
-    await waitForNext();
-    await mainWindow.loadURL('http://localhost:3000');
-    mainWindow.webContents.openDevTools();
+    await waitForNext()
+    await mainWindow.loadURL('http://localhost:3000')
+    mainWindow.webContents.openDevTools()
   } else {
-    await mainWindow.loadURL('file://' + path.join(__dirname, '../renderer/index.html'));
+    await mainWindow.loadURL('file://' + path.join(__dirname, '../renderer/index.html'))
   }
 }
 
 app.whenReady().then(() => {
-  createWindow();
+  createWindow()
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  })
+})
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+  if (process.platform !== 'darwin') app.quit()
+})
 
 ipcMain.handle('app:version', () => {
-  return app.getVersion();
-});
+  return app.getVersion()
+})
