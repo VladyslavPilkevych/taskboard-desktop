@@ -28,6 +28,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Search, Filter, PlusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTasks } from "@/lib/tasks-store";
 
 type TaskStatus = "todo" | "done";
 type ViewFilter = "all" | "active" | "completed";
@@ -41,24 +42,6 @@ interface Task {
 }
 
 const COLUMN_IDS: TaskStatus[] = ["todo", "done"];
-
-function createTask(
-  title: string,
-  description: string,
-  existing: Task[]
-): Task {
-  const todoTasks = existing.filter((t) => t.status === "todo");
-  const nextOrder =
-    todoTasks.length > 0 ? Math.max(...todoTasks.map((t) => t.order)) + 1 : 0;
-
-  return {
-    id: crypto.randomUUID(),
-    title,
-    description,
-    status: "todo",
-    order: nextOrder,
-  };
-}
 
 interface SortableTaskCardProps {
   task: Task;
@@ -171,7 +154,7 @@ function TaskColumn({
 }
 
 export default function HomePage() {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { tasks, updateTasks } = useTasks();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [search, setSearch] = useState("");
@@ -214,64 +197,76 @@ export default function HomePage() {
 
   function handleAddTask() {
     if (!title.trim()) return;
-    setTasks((prev) => [
-      ...prev,
-      createTask(title.trim(), description.trim(), prev),
-    ]);
+
+    updateTasks((prev) => {
+      const todoTasks = prev.filter((t) => t.status === "todo");
+      const nextOrder =
+        todoTasks.length > 0
+          ? Math.max(...todoTasks.map((t) => t.order)) + 1
+          : 0;
+
+      const newTask: Task = {
+        id: crypto.randomUUID(),
+        title: title.trim(),
+        description: description.trim(),
+        status: "todo",
+        order: nextOrder,
+      };
+
+      return [...prev, newTask];
+    });
+
     setTitle("");
     setDescription("");
   }
 
-function handleToggleCompleted(id: string, value: boolean) {
-  setTasks((prev) => {
-    const task = prev.find((t) => t.id === id);
-    if (!task) return prev;
+  function handleToggleCompleted(id: string, value: boolean) {
+    updateTasks((prev) => {
+      const task = prev.find((t) => t.id === id);
+      if (!task) return prev;
 
-    const fromStatus = task.status;
-    const targetStatus: TaskStatus = value ? "done" : "todo";
-    if (fromStatus === targetStatus) return prev;
+      const fromStatus = task.status;
+      const targetStatus: TaskStatus = value ? "done" : "todo";
+      if (fromStatus === targetStatus) return prev;
 
-    const moved: Task = { ...task, status: targetStatus };
+      const moved: Task = { ...task, status: targetStatus };
+      const others = prev.filter((t) => t.id !== id);
+      const result = [...others, moved];
 
-    const others = prev.filter((t) => t.id !== id);
+      const override = new Map<string, number>();
 
-    const result = [...others, moved];
+      (["todo", "done"] as TaskStatus[]).forEach((status) => {
+        const col = result
+          .filter((t) => t.status === status)
+          .sort((a, b) => {
+            if (status === targetStatus) {
+              if (a.id === id) return -1;
+              if (b.id === id) return 1;
+            }
+            return a.order - b.order;
+          });
 
-    const override = new Map<string, number>();
-
-    (["todo", "done"] as TaskStatus[]).forEach((status) => {
-      const col = result
-        .filter((t) => t.status === status)
-        .sort((a, b) => {
-          if (status === targetStatus) {
-            if (a.id === id) return -1;
-            if (b.id === id) return 1;
-          }
-          return a.order - b.order;
+        col.forEach((t, index) => {
+          override.set(t.id, index);
         });
+      });
 
-      col.forEach((t, index) => {
-        override.set(t.id, index);
+      return result.map((t) => {
+        const newOrder = override.get(t.id);
+        return newOrder !== undefined ? { ...t, order: newOrder } : t;
       });
     });
-
-    return result.map((t) => {
-      const newOrder = override.get(t.id);
-      return newOrder !== undefined ? { ...t, order: newOrder } : t;
-    });
-  });
-}
-
+  }
 
   function handleDeleteTask(id: string) {
-    setTasks((prev) => prev.filter((task) => task.id !== id));
+    updateTasks((prev) => prev.filter((task) => task.id !== id));
   }
 
   function handleEditTask(
     id: string,
     data: { title: string; description: string }
   ) {
-    setTasks((prev) =>
+    updateTasks((prev) =>
       prev.map((task) =>
         task.id === id
           ? { ...task, title: data.title, description: data.description }
@@ -299,7 +294,7 @@ function handleToggleCompleted(id: string, value: boolean) {
     if (!over) return;
     if (active.id === over.id) return;
 
-    setTasks((prev) => {
+    updateTasks((prev) => {
       const activeId = String(active.id);
       const overId = String(over.id);
 
@@ -308,12 +303,10 @@ function handleToggleCompleted(id: string, value: boolean) {
 
       const activeStatus: TaskStatus = activeTask.status;
 
-      // 1) определяем целевой статус и целевую позицию
       let targetStatus: TaskStatus | null = null;
       let targetTaskId: string | null = null;
 
       if (COLUMN_IDS.includes(overId as TaskStatus)) {
-        // брошено в пустую часть колонки (over.id = "todo" | "done")
         targetStatus = overId as TaskStatus;
       } else {
         const overTask = prev.find((t) => t.id === overId);
@@ -325,7 +318,6 @@ function handleToggleCompleted(id: string, value: boolean) {
 
       if (!targetStatus) return prev;
 
-      // 2) если перетаскиваем внутри одной и той же колонки
       if (targetStatus === activeStatus) {
         const columnTasks = prev
           .filter((t) => t.status === activeStatus)
@@ -354,7 +346,6 @@ function handleToggleCompleted(id: string, value: boolean) {
         );
       }
 
-      // 3) если переносим между колонками (todo <-> done)
       const fromTasks = prev
         .filter((t) => t.status === activeStatus)
         .sort((a, b) => a.order - b.order);
