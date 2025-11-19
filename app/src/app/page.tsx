@@ -17,9 +17,9 @@ import { Button } from "@/components/ui/button";
 import { TaskCard } from "@/components/task-card";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Search, Filter } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/cn";
 import { motion, AnimatePresence } from "framer-motion";
-import { useTasksBoard } from "@/lib/use-tasks-board";
+import { useTasksBoard } from "@/utils/hooks/use-tasks-board";
 import { TaskColumn } from "@/components/task-column";
 import CreateTaskComponent from "@/components/create-task-component";
 

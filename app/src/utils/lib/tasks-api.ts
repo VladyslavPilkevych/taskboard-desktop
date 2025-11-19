@@ -1,4 +1,4 @@
-import { ApiTask, CreateTaskInput, Task, UpdateTaskInput } from "./types";
+import { ApiTask, CreateTaskInput, Task, UpdateTaskInput } from "@/utils/types/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 

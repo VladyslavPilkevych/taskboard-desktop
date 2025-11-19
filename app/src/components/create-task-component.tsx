@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { useTasksBoard } from "@/lib/use-tasks-board";
+import { useTasksBoard } from "@/utils/hooks/use-tasks-board";
 
 export default function CreateTaskComponent() {
   const [title, setTitle] = useState("");

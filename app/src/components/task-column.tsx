@@ -7,7 +7,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/cn";
 import { SortableTaskCard } from "./task-card-sortable";
 
 type TaskStatus = "todo" | "done";

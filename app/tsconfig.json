@@ -24,12 +24,12 @@
     ],
     "paths": {
       "@/*": [
-        "./src/*"
-      ]
+        "./src/*",
+      ],
     },
      "types": [
       "node",
-      "./src/types/css.d.ts"
+      "./src/utils/theme/css.d.ts"
     ]
   },
   "include": [

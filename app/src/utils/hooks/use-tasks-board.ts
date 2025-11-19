@@ -1,21 +1,21 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Task, TaskStatus, CreateTaskInput, UpdateTaskInput } from "./types";
+import { Task, TaskStatus, CreateTaskInput, UpdateTaskInput } from "@/utils/types/types";
 import {
   fetchTasksApi,
   createTaskApi,
   updateTaskApi,
   deleteTaskApi,
   reorderTasksApi,
-} from "./tasks-api";
+} from "../lib/tasks-api";
 import {
   applyDeleteTask,
   applyEditTask,
   applyReorder,
   applyToggleStatus,
   createLocalTask,
-} from "./board-logic";
+} from "../lib/board-logic";
 
 export function useTasksBoard() {
   const queryClient = useQueryClient();
@@ -98,15 +98,19 @@ export function useTasksBoard() {
     queryClient.setQueryData<Task[]>(["tasks"], (old = []) =>
       applyEditTask(old, id, title, description)
     );
+
     updateMutation.mutate({ id, data: { title, description } });
   }
 
   function toggleTaskCompleted(id: string, completed: boolean) {
     const targetStatus: TaskStatus = completed ? "done" : "todo";
 
-    queryClient.setQueryData<Task[]>(["tasks"], (old = []) =>
-      applyToggleStatus(old, id, targetStatus)
-    );
+    queryClient.setQueryData<Task[]>(["tasks"], (old = []) => {
+    const next = applyToggleStatus(old, id, targetStatus);
+
+    reorderMutation.mutate(next);
+    return next;
+  });
 
     updateMutation.mutate({ id, data: { status: targetStatus } });
   }

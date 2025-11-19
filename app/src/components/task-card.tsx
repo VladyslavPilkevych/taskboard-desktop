@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/lib/cn";
 import { TaskDialogEdit } from "@/components/task-dialog-edit";
 import { TaskDialogDelete } from "@/components/task-dialog-delete";
 

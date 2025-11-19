@@ -1,4 +1,4 @@
-import { Task, TaskStatus } from "./types";
+import { Task, TaskStatus } from "@/utils/types/types";
 
 export function createLocalTask(
   title: string,
@@ -30,31 +30,26 @@ export function applyToggleStatus(
   if (fromStatus === targetStatus) return tasks;
 
   const moved: Task = { ...task, status: targetStatus };
-  const others = tasks.filter((t) => t.id !== id);
-  const result = [...others, moved];
 
-  const override = new Map<string, number>();
+  const source = tasks
+    .filter((t) => t.id !== id && t.status === fromStatus)
+    .sort((a, b) => a.order - b.order);
 
-  (["todo", "done"] as TaskStatus[]).forEach((status) => {
-    const col = result
-      .filter((t) => t.status === status)
-      .sort((a, b) => {
-        if (status === targetStatus) {
-          if (a.id === id) return -1;
-          if (b.id === id) return 1;
-        }
-        return a.order - b.order;
-      });
+  const target = tasks
+    .filter((t) => t.id !== id && t.status === targetStatus)
+    .sort((a, b) => a.order - b.order);
 
-    col.forEach((t, index) => {
-      override.set(t.id, index);
-    });
-  });
+  const newSource = source.map((t, index) => ({
+    ...t,
+    order: index,
+  }));
 
-  return result.map((t) => {
-    const newOrder = override.get(t.id);
-    return newOrder !== undefined ? { ...t, order: newOrder } : t;
-  });
+  const newTarget = [moved, ...target].map((t, index) => ({
+    ...t,
+    order: index,
+  }));
+
+  return [...newSource, ...newTarget];
 }
 
 export function applyEditTask(
