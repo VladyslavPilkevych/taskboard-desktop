@@ -1,212 +1,259 @@
 # Taskboard Desktop
 
-Cross-platform desktop application for managing tasks, built with Electron, Next.js, and NestJS.  
-The app provides a modern UI for creating, editing, filtering, and searching tasks, packaged as a desktop application for macOS and Windows.
-
----
-
-## Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Environment Variables](#environment-variables)
-- [Database and Prisma](#database-and-prisma)
-- [Running the Project](#running-the-project)
-  - [Backend only](#backend-only)
-  - [Frontend only](#frontend-only)
-  - [Electron shell only](#electron-shell-only)
-  - [All services together](#all-services-together)
-- [Docker](#docker)
-- [Available Scripts](#available-scripts)
-  - [Root](#root)
-  - [Frontend (`app`)](#frontend-app)
-  - [Backend (`backend`)](#backend-backend)
-  - [Electron (`src-electron`)](#electron-src-electron)
-- [API Reference](#api-reference)
-  - [Task model](#task-model)
-  - [REST Endpoints](#rest-endpoints)
-- [UI and UX Guidelines](#ui-and-ux-guidelines)
-- [Build for Production](#build-for-production)
-  - [Backend and Frontend](#backend-and-frontend)
-  - [Desktop packaging (Electron)](#desktop-packaging-electron)
-- [Screenshots](#screenshots)
-- [Roadmap](#roadmap)
-- [License](#license)
-
----
+Cross-platform desktop application for managing tasks, built with Electron, Next.js, and NestJS. The application provides a modern user interface for creating, editing, filtering, searching, and organizing tasks. It is packaged as a desktop application for macOS and Windows.
 
 ## Overview
 
-Taskboard Desktop is a monorepo that contains:
+Taskboard Desktop is structured as a pnpm monorepo and includes:
 
-- A **Next.js** application that provides the user interface.
-- A **NestJS** backend that exposes a REST API for task management.
-- An **Electron** shell that loads the Next.js frontend and packages everything into a desktop app.
-- A **PostgreSQL + Prisma** layer for persistent storage of tasks.
+* A **Next.js** application that serves as the frontend UI.
+* A **NestJS** backend that exposes a REST API for task operations.
+* An **Electron** shell that wraps the frontend into a desktop application.
+* **Prisma ORM** connected to **PostgreSQL** for persistent data storage.
 
-The app focuses on a clean and responsive UI, keyboard-friendly task management, and a smooth user experience on both macOS and Windows.
-
----
+The focus of the application is a clean, modern, and responsive user experience with smooth animations, task manipulation features, and desktop-level integration.
 
 ## Features
 
-- Create, edit, and delete tasks.
-- Fields:
-  - Title (required)
-  - Description (optional)
-  - Status: completed / not completed
-- Filter tasks:
-  - Completed
-  - Not completed
-  - All
-- Search tasks on the client side by title and description.
-- Drag-and-drop reordering and moving between columns using `@dnd-kit`.
-- Inline or modal-based task editing.
-- Light and dark themes (using `next-themes`).
-- Smooth micro-animations using `framer-motion`.
-- Local caching and state synchronization using **TanStack Query** (React Query).
-- Backend prepared for Dockerized deployment with PostgreSQL.
-
----
+* Create, edit, and delete tasks.
+* Manage task fields: title, description, and status.
+* Filter tasks by state: completed, not completed, or all.
+* Client-side search by task title and description.
+* Drag-and-drop task sorting using @dnd-kit.
+* Smooth UI animations and transitions.
+* Light and dark theme support using next-themes.
+* Local caching and syncing using TanStack Query.
+* Docker support for backend and database.
 
 ## Tech Stack
 
-### Frontend (App)
+### Frontend (app)
 
-- **Next.js 16+** (App Router)
-- **React 19**
-- **TypeScript**
-- **Tailwind CSS 4**
-- **Radix UI** (`@radix-ui/react-*`) as low-level primitives
-- **shadcn/ui** style approach (utility-first + composable components)
-- **TanStack React Query** and **Persist Client**
-- **Axios** for HTTP requests
-- **next-themes** for dark/light mode
-- **framer-motion** for animations
-- **@dnd-kit** for drag-and-drop
-- Utility libraries: `clsx`, `class-variance-authority`, `tailwind-merge`
+* Next.js 16 (App Router)
+* React 19
+* TypeScript
+* Tailwind CSS 4
+* Radix UI primitives
+* shadcn/ui style component architecture
+* TanStack React Query + Persist Client
+* Axios
+* next-themes for theme switching
+* framer-motion for animations
+* @dnd-kit for drag-and-drop
+* Utility libraries: clsx, class-variance-authority, tailwind-merge
 
-### Backend (API)
+### Backend (backend)
 
-- **Node.js**
-- **NestJS 11**
-- **TypeScript**
-- **Prisma ORM** with **PostgreSQL**
-- **class-validator** and **class-transformer** for DTO validation
-- **@nestjs/config** for configuration management
-- **RxJS** used internally by NestJS
+* NestJS 11
+* Node.js
+* TypeScript
+* Prisma ORM
+* PostgreSQL
+* class-validator, class-transformer
+* @nestjs/config
 
-### Desktop Shell
+### Desktop Shell (src-electron)
 
-- **Electron.js**
-- Main and preload scripts under `src-electron`
-- The Electron window loads the Next.js application and exposes a desktop runtime.
+* Electron.js
+* Preload and main process configuration
+* Loads the Next.js UI
 
-### Tooling and Monorepo
+### Tooling
 
-- **pnpm workspaces**
-- **TypeScript** across the whole monorepo
-- **Prisma CLI**
-- **concurrently** for running multiple processes in dev
-- Optional **Docker** setup for backend/PostgreSQL via `docker-compose.yml`
-
----
+* pnpm workspaces
+* TypeScript across all layers
+* Prisma CLI
+* concurrently for development scripts
+* Docker and docker-compose (optional)
 
 ## Project Structure
 
-```bash
-taskboard-desktop/
-├─ app/                # Next.js frontend (App Router)
-│  ├─ app/
-│  ├─ components/
-│  ├─ lib/
-│  └─ package.json
-├─ backend/            # NestJS API server
-│  ├─ src/
-│  ├─ test/
-│  └─ package.json
-├─ prisma/             # Prisma schema and migrations
-│  ├─ schema.prisma
-│  └─ migrations/
-├─ src-electron/       # Electron main and preload scripts
-│  └─ package.json
-├─ node_modules/
-├─ .env                # Root environment file
-├─ .gitignore
-├─ docker-compose.yml
-├─ package.json        # Root monorepo config and scripts
-├─ pnpm-lock.yaml
-└─ pnpm-workspace.yaml
 ```
-
-## Prerequisites
-- Node.js v20+
-- pnpm (as the package manager)
-- Docker and Docker Compose (optional but recommended for database)
-- Alternatively, a local PostgreSQL instance
+root
+├─ app/                # Next.js frontend
+├─ backend/            # NestJS backend API
+├─ prisma/             # Prisma schema and migrations
+├─ src-electron/       # Electron main and preload scripts
+├─ .env                # Environment variables
+├─ docker-compose.yml
+├─ package.json        # Root workspace configuration
+├─ pnpm-workspace.yaml
+└─ node_modules/
+```
 
 ## Environment Variables
-Create a .env file in the project root.
 
-```env
-# Backend
+Create a `.env` file at the project root.
+
+Example:
+
+```
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/taskboard"
 BACKEND_PORT=3001
-
-# Frontend
 NEXT_PUBLIC_API_URL="http://localhost:3001"
+NODE_ENV=development
 ```
 
-Depending on your Electron and Docker setup, you may add additional variables (for example, custom ports or Electron dev URLs).
+## Installing Dependencies
 
-The backend uses `@nestjs/config`, so environment variables are injected into the NestJS application. The frontend reads `NEXT_PUBLIC_...` variables at build time through Next.js.
+```
+pnpm install
+```
+
+This installs dependencies for all workspaces in the monorepo.
 
 ## Database and Prisma
 
-The project uses Prisma as an ORM on top of PostgreSQL.
+After configuring `.env`, run migrations:
 
-Prisma model for `Task` (approximate):
-
-```prisma
-model Task {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  done        Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
 ```
-
-After configuring `DATABASE_URL` in `.env`:
-```bash
 pnpm prisma:migrate
 ```
-This executes:
-```bash
+
+This command runs:
+
+```
 pnpm --filter backend prisma migrate dev
 ```
 
----
-
 ## Running the Project
 
-Start the NestJS backend in "dev" mode (build then run):
-```bash
+### Run the backend
+
+```
 pnpm dev:backend
 ```
 
-Start the Next.js app:
-```bash
+Starts the Nest.js backend in development mode.
+
+### Run the frontend
+
+```
 pnpm dev:frontend
 ```
 
-Start Electron in development mode:
-```bash
+Runs the Next.js development server.
+
+### Run Electron
+
+```
 pnpm dev:electron
 ```
+
+Starts Electron and loads the frontend.
+
+### Run everything together
+
+```
+pnpm dev
+```
+
+This runs backend, frontend, and Electron simultaneously.
+
+## Docker Setup
+
+Start the database and any additional services:
+
+```
+docker-compose up -d
+```
+
+Ensure `.env` points to the correct PostgreSQL container address.
+
+## Available Root Scripts
+
+* `dev:backend` – run NestJS backend
+* `dev:frontend` – run Next.js frontend
+* `dev:electron` – run Electron shell
+* `dev` – run all three concurrently
+* `build:backend` – build backend
+* `build:frontend` – build frontend
+* `build:electron` – build Electron scripts
+* `build` – build all workspaces
+* `prisma:migrate` – run Prisma migrations
+
+## API Reference
+
+### Task Model
+
+```
+Task {
+  id: string
+  title: string
+  description?: string
+  done: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+```
+
+### Endpoints
+
+* `GET /tasks` – return all tasks
+* `POST /tasks` – create a new task
+* `PATCH /tasks/:id` – update a task
+* `DELETE /tasks/:id` – delete a task
+
+## UI/UX Guidelines
+
+* Tailwind-based design system with 8px spacing grid
+* Customizable color palette (primary, secondary, neutral)
+* Essential UI components:
+
+  * Buttons (primary, secondary, destructive)
+  * Inputs and textareas
+  * Select, dropdown, checkbox
+  * Task cards
+  * Modal dialogs
+* Theme support (light and dark)
+* Smooth animations using framer-motion
+* Drag-and-drop reordering of tasks
+* Responsive layout for 1024x600 and larger desktop screens
+
+## Building for Production
+
+### Build all workspaces
+
+```
+pnpm build
+```
+
+### Build individually
+
+```
+pnpm build:backend
+pnpm build:frontend
+pnpm build:electron
+```
+
+### Electron Packaging
+
+Your packaging commands (for macOS and Windows installers) should be defined in `src-electron/package.json`. This typically includes commands from electron-builder or electron-forge.
+
+Example workflow:
+
+```
+cd src-electron
+pnpm build
+pnpm dist
+```
+
+## Screenshots
+
+![Dashboard Light](docs/screenshots/dashboard-light.png)
+
+Example of `Active` filter, dark theme and search `clean`
+
+![Dashboard Dark](docs/screenshots/dashboard-dark-active-search.png)
+
+## Roadmap
+
+* Platform-specific Electron packaging
+* Sorting and filtering improvements
+* Keyboard shortcuts for task operations
+* Alternative task views (Kanban columns)
+* E2E tests
+
+## License
+
+MIT License © 2025 Vladyslav Pilkevych
